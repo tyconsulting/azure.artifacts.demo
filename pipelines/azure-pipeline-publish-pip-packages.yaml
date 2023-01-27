@@ -11,7 +11,6 @@ parameters:
 variables:
   - name: feedName
     value: "pip-feed"
-  - template: ../_Templates/template-common-variables.yml
 
 stages:
   - stage: publish_pip_packages
