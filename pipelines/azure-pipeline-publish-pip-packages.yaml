@@ -1,0 +1,43 @@
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+
+trigger: none
+
+parameters:
+- name: package
+  displayName: "Pip Package Name"
+  type: string
+
+
+variables:
+  - name: feedName
+    value: "pip-feed"
+  - template: ../_Templates/template-common-variables.yml
+
+stages:
+  - stage: publish_pip_packages
+    displayName: "Publish pip packages"
+    jobs:
+    - job: download_publish_pip_packages
+      displayName: Download and Publish PIP Packages
+      pool:
+        vmImage: "ubuntu-latest" # change this line from vmImage to name when using self-hosted agents
+      steps:
+        - task: Bash@3
+          name: initiation
+          displayName: "Initiation"
+          inputs:
+            pwsh: true
+            targetType: 'filePath'
+            filePath: "scripts/pipeline-push-pip-package-initiation.sh"
+        - task: TwineAuthenticate@0
+          displayName: Configure twine authentication
+          inputs:
+            artifactFeeds: $(feedName)
+        - task: Bash@3
+          name: publish_db_cli
+          displayName: "Publish to Azure Artifacts"
+          inputs:
+            pwsh: true
+            targetType: 'filePath'
+            filePath: "scripts/pipeline-push-pip-package.sh"
+            arguments: -o '$(adoOrgName)' -f '$(feedName)' -p '${{parameters.package}}' -r $(PYPIRC_PATH)
