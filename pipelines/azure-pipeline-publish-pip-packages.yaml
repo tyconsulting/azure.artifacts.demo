@@ -33,7 +33,7 @@ stages:
           inputs:
             artifactFeeds: $(feedName)
         - task: Bash@3
-          name: publish_db_cli
+          name: publish_pip_pkg
           displayName: "Publish to Azure Artifacts"
           inputs:
             pwsh: true
